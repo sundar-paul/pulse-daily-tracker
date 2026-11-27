@@ -1,0 +1,9 @@
+{
+  "name": "Pulse — Daily Tasks & Expense Tracker",
+  "short_name": "Pulse Tracker",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#14161b",
+  "theme_color": "#14161b",
+  "description": "Personal daily checklist, expense tracker, and weekly/monthly analytics dashboard."
+}

@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pulse — Daily Tasks & Expense Dashboard</title>
+  <meta name="theme-color" content="#14161b" />
+  <link rel="manifest" href="./manifest.json" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="brand-icon" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+          </svg>
+        </div>
+        <div>
+          <div class="brand-name">Pulse</div>
+          <div class="brand-sub">Personal Tracker</div>
+        </div>
+      </div>
+
+      <nav class="nav-list" aria-label="Main Navigation">
+        <button class="nav-item active" data-view="dashboard">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="9" rx="1.5"></rect>
+            <rect x="14" y="3" width="7" height="5" rx="1.5"></rect>
+            <rect x="14" y="12" width="7" height="9" rx="1.5"></rect>
+            <rect x="3" y="16" width="7" height="5" rx="1.5"></rect>
+          </svg>
+          <span>Dashboard</span>
+        </button>
+        <button class="nav-item" data-view="tasks">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 11l3 3L22 4"></path>
+            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+          </svg>
+          <span>Daily Tasks</span>
+          <span class="nav-badge" id="nav-tasks-badge">0</span>
+        </button>
+        <button class="nav-item" data-view="expenses">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2v20"></path>
+            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+          </svg>
+          <span>Expenses</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="sync-pill" id="sync-status" title="Data is saved locally in your browser">
+          <span class="sync-dot"></span>
+          <span id="sync-label">Saved in browser</span>
+        </div>
+        <button class="btn-ghost full-width" id="btn-open-settings">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+          <span>Settings & Backup</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Workspace -->
+    <main class="main-content">
+      <!-- Demo Banner -->
+      <div class="demo-banner hidden" id="demo-banner">
+        <div class="demo-banner-text">
+          <span class="demo-dot"></span>
+          <span>Exploring with sample data so you can preview the analytics dashboard.</span>
+        </div>
+        <div class="demo-banner-actions">
+          <button class="btn-sm btn-danger-outline" id="btn-clear-demo">Clear Sample Data &amp; Start Fresh</button>
+        </div>
+      </div>
+
+      <!-- Top Header -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <h1 id="page-title">Overview Dashboard</h1>
+          <p class="subtitle" id="page-subtitle">Your daily productivity &amp; spending at a glance</p>
+        </div>
+
+        <div class="topbar-right">
+          <div class="date-nav">
+            <button class="icon-btn" id="btn-prev-day" title="Previous day" aria-label="Previous day">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            </button>
+            <input type="date" id="active-date-input" class="date-input" aria-label="Selected date" />
+            <button class="icon-btn" id="btn-next-day" title="Next day" aria-label="Next day">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </button>
+            <button class="btn-sm btn-ghost" id="btn-today">Today</button>
+          </div>
+
+          <div class="segmented-control" role="tablist" aria-label="Analytics period">
+            <button class="seg-btn active" data-period="weekly">Weekly</button>
+            <button class="seg-btn" data-period="monthly">Monthly</button>
+          </div>
+
+          <button class="btn-primary" id="btn-quick-expense">+ Expense</button>
+        </div>
+      </header>
+
+      <!-- ==================== VIEW: DASHBOARD ==================== -->
+      <section class="view active" id="view-dashboard">
+        <!-- KPI Strip -->
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <span class="kpi-label">Selected Day Rate</span>
+              <span class="kpi-tag tag-green" id="kpi-rate-tag">0/0 done</span>
+            </div>
+            <div class="kpi-value" id="kpi-today-rate">0%</div>
+            <div class="kpi-sub" id="kpi-rate-sub">No tasks scheduled</div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <span class="kpi-label" id="kpi-finished-label">7-Day Finished</span>
+              <span class="kpi-tag tag-blue" id="kpi-streak-tag">0d streak</span>
+            </div>
+            <div class="kpi-value" id="kpi-period-finished">0 items</div>
+            <div class="kpi-sub" id="kpi-avg-rate-sub">Avg completion: 0%</div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <span class="kpi-label" id="kpi-spend-label">7-Day Spending</span>
+              <span class="kpi-tag tag-amber" id="kpi-today-spend-tag">Today: ₹0</span>
+            </div>
+            <div class="kpi-value" id="kpi-period-spend">₹0</div>
+            <div class="kpi-sub" id="kpi-daily-avg-sub">Daily avg: ₹0</div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <span class="kpi-label">Monthly Budget</span>
+              <span class="kpi-tag tag-purple" id="kpi-budget-pct">0% used</span>
+            </div>
+            <div class="kpi-value" id="kpi-month-spend">₹0</div>
+            <div class="mini-progress"><div class="mini-progress-fill" id="kpi-budget-bar"></div></div>
+            <div class="kpi-sub" id="kpi-budget-sub">Set budget in Settings</div>
+          </div>
+        </div>
+
+        <!-- Main Charts Row -->
+        <div class="grid-2">
+          <!-- Task Completion Chart Card -->
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h2 class="card-title">Task Completion Rate</h2>
+                <p class="card-desc" id="dash-task-chart-desc">Last 7 days completion percentage</p>
+              </div>
+              <span class="legend-inline">
+                <span class="legend-dot dot-green"></span>Past days
+                <span class="legend-dot dot-blue"></span>Selected
+              </span>
+            </div>
+            <div class="chart-container" id="dash-task-chart"></div>
+            <div class="card-metrics-strip">
+              <div class="metric-cell">
+                <div class="metric-label">Day's Rate</div>
+                <div class="metric-val" id="strip-today-rate">0%</div>
+              </div>
+              <div class="metric-cell">
+                <div class="metric-label" id="strip-finished-label">7-Day Finished</div>
+                <div class="metric-val" id="strip-period-finished">0 items</div>
+              </div>
+              <div class="metric-cell">
+                <div class="metric-label">Perfect Streak</div>
+                <div class="metric-val" id="strip-perfect-streak">0 days</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Expense Trend Chart Card -->
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h2 class="card-title">Spending Trend</h2>
+                <p class="card-desc" id="dash-expense-chart-desc">Daily expenses over the last 7 days</p>
+              </div>
+              <span class="legend-inline">
+                <span class="legend-dot dot-amber"></span>Daily spend
+                <span class="legend-dot dot-blue"></span>Selected
+              </span>
+            </div>
+            <div class="chart-container" id="dash-expense-chart"></div>
+            <div class="card-metrics-strip">
+              <div class="metric-cell">
+                <div class="metric-label">Day's Spend</div>
+                <div class="metric-val" id="strip-today-spend">₹0</div>
+              </div>
+              <div class="metric-cell">
+                <div class="metric-label" id="strip-spend-label">7-Day Total</div>
+                <div class="metric-val" id="strip-period-spend">₹0</div>
+              </div>
+              <div class="metric-cell">
+                <div class="metric-label">Top Category</div>
+                <div class="metric-val" id="strip-top-cat">—</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom Row: Quick Checklist + Category Breakdown -->
+        <div class="grid-2">
+          <!-- Today's Quick Checklist -->
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h2 class="card-title" id="dash-checklist-title">Today's Checklist</h2>
+                <p class="card-desc" id="dash-checklist-sub">Add tasks and check them off as you go</p>
+              </div>
+              <button class="btn-link" data-jump="tasks">Manage all &rarr;</button>
+            </div>
+            <form class="quick-add-form" id="dash-task-form">
+              <input type="text" id="dash-task-input" class="text-input" placeholder="Add a daily task..." autocomplete="off" required />
+              <button type="submit" class="btn-primary">Add</button>
+            </form>
+            <ul class="task-list scrollable" id="dash-task-list"></ul>
+          </div>
+
+          <!-- Category Spending Breakdown -->
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h2 class="card-title">Spending by Category</h2>
+                <p class="card-desc" id="dash-cat-desc">Breakdown for the selected period</p>
+              </div>
+              <button class="btn-link" data-jump="expenses">View ledger &rarr;</button>
+            </div>
+            <div class="donut-layout">
+              <div class="donut-wrap" id="dash-category-donut"></div>
+              <div class="category-bars" id="dash-category-bars"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== VIEW: DAILY TASKS ==================== -->
+      <section class="view" id="view-tasks">
+        <!-- 7-Day Interactive Day Strip -->
+        <div class="day-strip" id="tasks-day-strip"></div>
+
+        <div class="grid-tasks">
+          <!-- Left: Task Manager -->
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h2 class="card-title" id="tasks-view-date-title">Tasks</h2>
+                <p class="card-desc" id="tasks-view-progress">0 of 0 completed</p>
+              </div>
+              <div class="filter-pills" id="task-filter-pills">
+                <button class="pill active" data-filter="all">All</button>
+                <button class="pill" data-filter="pending">Pending</button>
+                <button class="pill" data-filter="completed">Completed</button>
+              </div>
+            </div>
+
+            <form class="task-create-box" id="full-task-form">
+              <input type="text" id="full-task-input" class="text-input" placeholder="Add a milestone or daily task..." autocomplete="off" required />
+              <select id="full-task-priority" class="select-input" aria-label="Task priority">
+                <option value="normal">Normal</option>
+                <option value="high">High Priority</option>
+                <option value="routine">Daily Routine</option>
+              </select>
+              <label class="checkbox-pill" title="Automatically include this task on every new day">
+                <input type="checkbox" id="full-task-recurring" />
+                <span>Repeat daily</span>
+              </label>
+              <button type="submit" class="btn-primary">Add Task</button>
+            </form>
+
+            <ul class="task-list tall" id="full-task-list"></ul>
+
+            <!-- Recurring Daily Habits Manager -->
+            <div class="recurring-section">
+              <div class="section-mini-header">
+                <span>Daily Recurring Tasks</span>
+                <span class="muted-text" id="recurring-count">0 active</span>
+              </div>
+              <div class="recurring-chips" id="recurring-chips"></div>
+            </div>
+          </div>
+
+          <!-- Right: Task Analytics -->
+          <div class="stack">
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <h2 class="card-title">Completion Analytics</h2>
+                  <p class="card-desc" id="tasks-chart-desc">Weekly completion performance</p>
+                </div>
+              </div>
+              <div class="chart-container" id="tasks-page-chart"></div>
+              <div class="card-metrics-strip">
+                <div class="metric-cell">
+                  <div class="metric-label">Avg Rate</div>
+                  <div class="metric-val" id="tasks-avg-rate">0%</div>
+                </div>
+                <div class="metric-cell">
+                  <div class="metric-label">Best Streak</div>
+                  <div class="metric-val" id="tasks-best-streak">0 days</div>
+                </div>
+                <div class="metric-cell">
+                  <div class="metric-label">Total Done</div>
+                  <div class="metric-val" id="tasks-total-done">0</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <h2 class="card-title">30-Day Consistency Heatmap</h2>
+                  <p class="card-desc">Click any square to inspect that day's checklist</p>
+                </div>
+              </div>
+              <div class="heatmap-grid" id="tasks-heatmap"></div>
+              <div class="heatmap-legend">
+                <span>Less</span>
+                <span class="hm-cell lv-0"></span>
+                <span class="hm-cell lv-1"></span>
+                <span class="hm-cell lv-2"></span>
+                <span class="hm-cell lv-3"></span>
+                <span class="hm-cell lv-4"></span>
+                <span>100%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== VIEW: EXPENSES ==================== -->
+      <section class="view" id="view-expenses">
+        <!-- Expense Summary Strip -->
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-header"><span class="kpi-label">Selected Day Spend</span></div>
+            <div class="kpi-value" id="exp-kpi-today">₹0</div>
+            <div class="kpi-sub" id="exp-kpi-today-count">0 transactions</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-header"><span class="kpi-label" id="exp-kpi-period-label">7-Day Total</span></div>
+            <div class="kpi-value" id="exp-kpi-period">₹0</div>
+            <div class="kpi-sub" id="exp-kpi-period-avg">Daily avg: ₹0</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-header"><span class="kpi-label">This Month</span></div>
+            <div class="kpi-value" id="exp-kpi-month">₹0</div>
+            <div class="kpi-sub" id="exp-kpi-month-rem">Budget remaining: —</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-header"><span class="kpi-label">Highest Spend Day</span></div>
+            <div class="kpi-value" id="exp-kpi-peak">₹0</div>
+            <div class="kpi-sub" id="exp-kpi-peak-date">In current period</div>
+          </div>
+        </div>
+
+        <div class="grid-expenses">
+          <!-- Left: Add Expense + Ledger -->
+          <div class="stack">
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <h2 class="card-title">Log Daily Expense</h2>
+                  <p class="card-desc">Record spending quickly to keep analytics up to date</p>
+                </div>
+              </div>
+              <form class="expense-form" id="full-expense-form">
+                <div class="form-row">
+                  <div class="field">
+                    <label for="exp-amount">Amount</label>
+                    <input type="number" id="exp-amount" class="text-input" step="0.01" min="0.01" placeholder="0.00" required />
+                  </div>
+                  <div class="field grow-2">
+                    <label for="exp-title">Description</label>
+                    <input type="text" id="exp-title" class="text-input" placeholder="e.g., Lunch, Metro card, Groceries" autocomplete="off" required />
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="field">
+                    <label for="exp-category">Category</label>
+                    <select id="exp-category" class="select-input"></select>
+                  </div>
+                  <div class="field">
+                    <label for="exp-payment">Payment</label>
+                    <select id="exp-payment" class="select-input">
+                      <option value="UPI">UPI</option>
+                      <option value="Card">Card</option>
+                      <option value="Cash">Cash</option>
+                      <option value="Bank">Bank Transfer</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label for="exp-date">Date</label>
+                    <input type="date" id="exp-date" class="text-input" required />
+                  </div>
+                  <div class="field align-end">
+                    <button type="submit" class="btn-primary full-width">Add Expense</button>
+                  </div>
+                </div>
+              </form>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <h2 class="card-title">Expense Ledger</h2>
+                  <p class="card-desc" id="ledger-count-sub">0 entries</p>
+                </div>
+                <div class="ledger-filters">
+                  <input type="search" id="exp-search" class="text-input sm" placeholder="Search..." />
+                  <select id="exp-filter-cat" class="select-input sm" aria-label="Filter by category">
+                    <option value="all">All Categories</option>
+                  </select>
+                  <select id="exp-filter-range" class="select-input sm" aria-label="Filter by range">
+                    <option value="period">Current Period</option>
+                    <option value="day">Selected Day</option>
+                    <option value="all">All Time</option>
+                  </select>
+                </div>
+              </div>
+              <div class="ledger-list" id="expense-ledger"></div>
+            </div>
+          </div>
+
+          <!-- Right: Expense Charts -->
+          <div class="stack">
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <h2 class="card-title">Spending Analytics</h2>
+                  <p class="card-desc" id="exp-chart-desc">Daily spending breakdown</p>
+                </div>
+              </div>
+              <div class="chart-container" id="expenses-page-chart"></div>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <h2 class="card-title">Category Breakdown</h2>
+                  <p class="card-desc">Where your money goes</p>
+                </div>
+              </div>
+              <div class="donut-layout">
+                <div class="donut-wrap" id="exp-category-donut"></div>
+                <div class="category-bars" id="exp-category-bars"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Quick Expense Modal -->
+  <div class="modal-backdrop hidden" id="modal-quick-expense" role="dialog" aria-modal="true" aria-labelledby="qe-title">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="qe-title">Quick Add Expense</h3>
+        <button class="icon-btn" data-close-modal="modal-quick-expense" aria-label="Close">&times;</button>
+      </div>
+      <form id="modal-expense-form" class="modal-body">
+        <div class="field">
+          <label for="m-exp-amount">Amount</label>
+          <input type="number" id="m-exp-amount" class="text-input" step="0.01" min="0.01" placeholder="0.00" required />
+        </div>
+        <div class="field">
+          <label for="m-exp-title">Description</label>
+          <input type="text" id="m-exp-title" class="text-input" placeholder="Coffee, Uber, Groceries..." required />
+        </div>
+        <div class="form-row">
+          <div class="field">
+            <label for="m-exp-category">Category</label>
+            <select id="m-exp-category" class="select-input"></select>
+          </div>
+          <div class="field">
+            <label for="m-exp-payment">Payment</label>
+            <select id="m-exp-payment" class="select-input">
+              <option value="UPI">UPI</option>
+              <option value="Card">Card</option>
+              <option value="Cash">Cash</option>
+              <option value="Bank">Bank Transfer</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label for="m-exp-date">Date</label>
+          <input type="date" id="m-exp-date" class="text-input" required />
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-ghost" data-close-modal="modal-quick-expense">Cancel</button>
+          <button type="submit" class="btn-primary">Save Expense</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Settings & Backup Modal -->
+  <div class="modal-backdrop hidden" id="modal-settings" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="settings-title">Settings &amp; Local Backup</h3>
+        <button class="icon-btn" data-close-modal="modal-settings" aria-label="Close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="settings-form" class="stack-sm">
+          <div class="form-row">
+            <div class="field">
+              <label for="set-currency">Currency Symbol</label>
+              <select id="set-currency" class="select-input">
+                <option value="₹">₹ (INR)</option>
+                <option value="$">$ (USD)</option>
+                <option value="€">€ (EUR)</option>
+                <option value="£">£ (GBP)</option>
+                <option value="¥">¥ (JPY)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="set-budget">Monthly Expense Budget</label>
+              <input type="number" id="set-budget" class="text-input" min="0" step="100" placeholder="25000" />
+            </div>
+          </div>
+          <button type="submit" class="btn-primary">Save Preferences</button>
+        </form>
+
+        <hr class="divider" />
+
+        <div class="stack-sm">
+          <div class="section-mini-header"><span>Export &amp; Import</span></div>
+          <div class="btn-row">
+            <button class="btn-ghost" id="btn-export-json">Export JSON Backup</button>
+            <button class="btn-ghost" id="btn-export-csv">Export Expenses CSV</button>
+          </div>
+          <div class="btn-row">
+            <label class="btn-ghost file-btn">
+              Import JSON Backup
+              <input type="file" id="input-import-json" accept="application/json" hidden />
+            </label>
+          </div>
+        </div>
+
+        <hr class="divider" />
+
+        <div class="stack-sm">
+          <div class="section-mini-header"><span>Data Management</span></div>
+          <div class="btn-row">
+            <button class="btn-ghost" id="btn-load-demo">Load Sample Data</button>
+            <button class="btn-danger-outline" id="btn-reset-all">Clear All Data</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Interactive Chart Tooltip -->
+  <div class="chart-tooltip hidden" id="chart-tooltip"></div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <script type="module" src="./js/app.js"></script>
+</body>
+</html>
